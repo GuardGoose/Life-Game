@@ -39,4 +39,28 @@ def update(frameNum, img, grid, n):
                 if total == 3:
                     newGrid[i, j] = ON
     # update data
+    img.set_data(newGrid)
+    grid[:] = newGrid[:]
+    return img,
+
+# main() function
+def main():
+    parser = argparse.ArgumentParser(description="Runs Conway's Game of Life")
+    # add arguments
+    parser.add_argument('--grid-size', dest='n', required=False)
+    parser.add_argument('--mov-file', dest='movfile', required=False)
+    parser.add_argument('--interval', dest='interval', required=False)
+    parser.add_argument('--glider', dest='store_true', required=False)
+    parser.add_argument('--gosper', dest='store_true', required=False)
+    args = parser.parse_args()
+    # set grid size
+    n = 100
+    if args.n and int(args.n) > 8:
+        n = int(args.n)
+
+    # setup animation interval update
+    update_interval = 50
+    if args.interval:
+        update_interval = int(args.interval)
+
     
