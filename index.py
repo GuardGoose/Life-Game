@@ -1,36 +1,42 @@
+import sys, argparse
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-x = np.array([[0, 0, 255], [255, 255, 0], [0, 255, 0]])
-plt.imshow(x, interpolation='nearest')
-plt.show()
+ON = 255
+OFF = 0
+vals = [ON, OFF]
 
-np.random.choice([0, 255], 4*4, p=[0.1, 0.9]).reshape(4, 4)
+def random_grid(n):
+    """returns grid of n*n values"""
+    return np.random.choice(vals, n*n, p=[0.2, 0.8]).reshape(n,n)
 
 def add_glider(i, j, grid):
-    """adds glider with top left cell at (i, j)"""
-    glider = np.array([[0, 0, 255],  # Defines glider
+    """adds a glider with top-left cell at (i, j)"""
+    glider = np.array([[0, 0, 255],
                        [255, 0, 255],
                        [0, 255, 255]])
-    grid[i:i+3, j:j+3] = glider  # numpy slice operation copies the pattern
-                                 # to two-dimensional array
+    grid[i:i+3, j:j+3] = glider
 
-grid = np.zeros(N*N).reshape(N, N)
-add_glider(1, 1, grid)
-
-# Boundary Conditions
-
-if j == N-1:
-    right = grid[i][0]
-else:
-    right = grid[i][j+1]
-
-# Apply Conway's rules
-
-if grid[i, j] == ON:
-    if (total <2 ) or (total > 3):
-        newGrid[i, j] = OFF
-    else:
-        if total == 3:
-            newGrid[i, j] = ON
+def update(frameNum, img, grid, n):
+    # copy grid since we require 8 neighbours for calculation
+    # and we can go line by line
+    newGrid = grid.copy()
+    for i in range(n):
+        for j in range(n):
+            # compute 8-neighbour sum using toroidal boundary conditions
+            # x and y wrap around so that the simulation
+            # takes place on a torodial surface
+            total = int((grid[i, (j-1) % n] + grid[i, (j+1) % n] +
+                         grid[(i-1) % n, j] + grid[(i-1) % n, j] +
+                         grid[(i-1) % n, (j-1) % n] + grid[(i-1) % n, (j+1) % n] +
+                         grid[(i+1) % n, (j-1) % n] + grid[(i+1) % n, (j+1) % n]) / 255)
+            # apply Conway's Rules
+            if grid[i, j] == ON:
+                if (total < 2) or (total > 3):
+                    newGrid[i, j] = OFF
+            else:
+                if total == 3:
+                    newGrid[i, j] = ON
+    # update data
+    
