@@ -63,4 +63,30 @@ def main():
     if args.interval:
         update_interval = int(args.interval)
 
-    
+    # declare grid
+    grip = np.array([])
+    # check if "glider" demo flag is specified
+    if args.glider:
+        grid = np.zeros(n*n).reshape(n, n)
+        add_glider(1, 1, grid)
+    else:
+        # populate grid with random on/off
+        grid = random_grid(n)
+
+    # set up animation
+    fig, ax = plt.subplots()
+    img = ax.imshow(grid, interpolation='nearest')
+    ani = animation.FuncAnimation(fig, update, fargs=(img, grid, n, ),
+                                  frames=10,
+                                  interval=update_interval,
+                                  save_count=50)
+    # number of frames?
+    # set the output file
+    if args.movfile:
+        ani.save(args.movfile, fps=30, extra_args=['-vcodec', 'libx264'])
+    plt.show()
+
+
+#call main
+if __name__ == '__main()__':
+    main()
